@@ -35,39 +35,55 @@ foreach ($userProgressRecords as $progress) {
 include_once '../../src/includes/employee_header.php';
 ?>
 
-<h1>Welcome, <?php echo escape_html($_SESSION['first_name']); ?>!</h1>
-<p>Here are your available training modules. Click on a module to view its lessons and start learning.</p>
+<h1 class="mb-4">Welcome, <?php echo escape_html($_SESSION['first_name']); ?>!</h1>
+<p class="lead">Here are your available training modules. Click on a module to view its lessons and start learning.</p>
 
 <?php if (empty($activeModules)): ?>
-    <div class="message info">No training modules are currently available. Please check back later.</div>
+    <div class="alert alert-info">No training modules are currently available. Please check back later.</div>
 <?php else: ?>
-    <ul class="module-list">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <?php foreach ($activeModules as $module): ?>
             <?php
                 $progress = $moduleProgressMap[$module->module_id] ?? null;
                 $status_text = 'Not Started';
-                $status_class = 'status-not_started';
+                $status_key = 'not_started'; // Used for CSS class mapping
+                $badge_bg_class = 'bg-secondary'; // Default for not_started
+
                 if ($progress) {
                     $status_text = ucwords(str_replace('_', ' ', $progress->status));
-                    $status_class = 'status-' . strtolower($progress->status);
+                    $status_key = strtolower($progress->status);
+                    switch ($status_key) {
+                        case 'in_progress': $badge_bg_class = 'bg-warning text-dark'; break;
+                        case 'training_completed': $badge_bg_class = 'bg-info'; break;
+                        case 'quiz_available': $badge_bg_class = 'bg-orange'; break; // Custom class defined in style.css
+                        case 'quiz_in_progress': $badge_bg_class = 'bg-info text-dark'; break;
+                        case 'passed': $badge_bg_class = 'bg-success'; break;
+                        case 'failed': $badge_bg_class = 'bg-danger'; break;
+                        default: $badge_bg_class = 'bg-secondary'; break;
+                    }
                 }
             ?>
-            <li class="module-item">
-                <h3>
-                    <a href="view_module.php?module_id=<?php echo escape_html($module->module_id); ?>">
-                        <?php echo escape_html($module->title); ?>
-                    </a>
-                </h3>
-                <p><?php echo escape_html(substr($module->description, 0, 150) . (strlen($module->description) > 150 ? '...' : '')); ?></p>
-                <p><strong>Status:</strong> <span class="status-badge <?php echo $status_class; ?>"><?php echo escape_html($status_text); ?></span></p>
-                <a href="view_module.php?module_id=<?php echo escape_html($module->module_id); ?>" class="e-button">View Module</a>
-            </li>
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">
+                            <a href="view_module.php?module_id=<?php echo escape_html($module->module_id); ?>" class="text-decoration-none">
+                                <?php echo escape_html($module->title); ?>
+                            </a>
+                        </h5>
+                        <p class="card-text flex-grow-1"><?php echo escape_html(substr($module->description, 0, 120) . (strlen($module->description) > 120 ? '...' : '')); ?></p>
+                        <p class="mb-2"><strong>Status:</strong> <span class="status-badge <?php echo $badge_bg_class; ?>"><?php echo escape_html($status_text); ?></span></p>
+                        <a href="view_module.php?module_id=<?php echo escape_html($module->module_id); ?>" class="btn btn-primary mt-auto">View Module</a>
+                    </div>
+                </div>
+            </div>
         <?php endforeach; ?>
-    </ul>
+    </div>
 <?php endif; ?>
 
 <?php
-echo "</main>"; // Close main.e-container from header
+// The main container div is opened in employee_header.php and should be closed here.
+echo "</div>"; // Close .container from employee_header.php
 ob_end_flush();
 ?>
 </body>

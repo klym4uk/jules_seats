@@ -313,5 +313,29 @@ class QuizResult {
             return [];
         }
     }
+
+    /**
+     * Fetches all attempt details for a specific quiz, including user information.
+     * Ordered by user and then by attempt number.
+     *
+     * @param int $quiz_id
+     * @return array Array of quiz_results objects joined with user details.
+     */
+    public function getAllAttemptsDetailsForQuiz($quiz_id) {
+        $sql = "SELECT qr.*, u.first_name, u.last_name, u.email
+                FROM quiz_results qr
+                JOIN users u ON qr.user_id = u.user_id
+                WHERE qr.quiz_id = :quiz_id AND qr.completed_at IS NOT NULL
+                ORDER BY u.last_name ASC, u.first_name ASC, qr.attempt_number ASC";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':quiz_id', $quiz_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            error_log("Error fetching all attempt details for quiz: " . $e->getMessage());
+            return [];
+        }
+    }
 }
 ?>

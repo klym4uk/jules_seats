@@ -1,0 +1,265 @@
+/* General Body Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa; /* Light grey background for overall page */
+    color: #212529; /* Default text color */
+    line-height: 1.6;
+}
+
+/* Container override for consistent padding if needed, or use Bootstrap's mt-4, p-4 etc. */
+.container, .container-fluid {
+    /* padding-top: 20px; */ /* Handled by mt-4 on the div in headers */
+    /* padding-bottom: 20px; */
+}
+.e-container { /* Class used in employee pages before Bootstrap standardization */
+    background-color: #ffffff;
+    padding: 20px;
+    margin: 20px auto; /* Centering if it's a fixed width */
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+}
+
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+}
+/* Admin specific heading colors if needed */
+.admin-header + .container h1, .admin-header + .container h2, .admin-header + .container h3 {
+    color: #343a40; /* Darker admin headings */
+}
+/* Employee specific heading colors */
+.employee-header + .container h1, .employee-header + .container h2, .employee-header + .container h3 {
+    color: #0056b3; /* Primary blue for employee headings */
+}
+
+
+/* Button Styling */
+/* Using Bootstrap classes mostly, but can add global overrides or new button styles */
+.btn-action { /* Example of a custom button style if needed */
+    margin-right: 5px;
+}
+
+/* Table Styling */
+/* Bootstrap 'table' class will be used. Can add overrides here. */
+.table {
+    margin-bottom: 1rem;
+    color: #212529;
+    /* background-color: #fff; /* Ensure tables on colored backgrounds have white bg */
+}
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #e9ecef; /* Light grey for table headers */
+}
+.table-hover tbody tr:hover {
+    color: #212529;
+    background-color: rgba(0,0,0,0.075);
+}
+
+/* Form Enhancements */
+/* Bootstrap 'form-control', 'form-group' etc. will be used. */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+legend {
+    font-size: 1.25rem;
+    font-weight: 500;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+fieldset {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+}
+
+/* Card styling for dashboard items or module lists */
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+}
+.stat-card { /* Used in admin dashboard */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-basis: 200px; /* Default, can be overridden */
+    text-align: center;
+    margin-bottom: 1rem; /* For consistent spacing */
+}
+.stat-card h4{
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+.stat-card p{
+    font-size: 2em;
+    margin: 5px 0;
+    font-weight: 600;
+}
+
+
+/* Navigation bar styling (Bootstrap handles most, but for overrides) */
+.navbar {
+    margin-bottom: 1rem; /* Add some space below navbars */
+}
+
+/* Alert/Message Styling (Bootstrap handles this, but these are legacy selectors from previous steps) */
+.message { /* Legacy, should be replaced by Bootstrap alerts */
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
+.message.success { /* Legacy */
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+.message.error { /* Legacy */
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+.message.info { /* Legacy */
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb;
+}
+
+/* Status Badges Styling (from employee_header.php, now global) */
+.status-badge { display:inline-block; padding: .35em .65em; font-size: .75em; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; }
+.status-badge.bg-secondary { background-color: #6c757d !important; } /* Grey */
+.status-badge.bg-warning { background-color: #ffc107 !important; color: #000 !important; } /* Yellow */
+.status-badge.bg-info { background-color: #0dcaf0 !important; } /* Teal */
+.status-badge.bg-primary { background-color: #0d6efd !important; } /* Primary Blue */
+.status-badge.bg-success { background-color: #198754 !important; } /* Green */
+.status-badge.bg-danger { background-color: #dc3545 !important; } /* Red */
+.status-badge.bg-orange { background-color: #fd7e14 !important; } /* Orange for quiz_available */
+
+.status-not_started { background-color: #6c757d; }
+.status-in_progress { background-color: #ffc107; color: #333 !important; }
+.status-training_completed { background-color: #17a2b8; }
+.status-quiz_available { background-color: #fd7e14; }
+.status-quiz_in_progress { background-color: #0dcaf0; color: #000 !important;}
+.status-passed { background-color: #28a745; }
+.status-failed { background-color: #dc3545; }
+.status-viewed { background-color: #17a2b8; }
+.status-completed { background-color: #28a745; }
+.status-not_viewed { background-color: #6c757d; }
+
+
+/* Employee Dashboard Module/Lesson list items */
+.module-list, .lesson-list { list-style: none; padding: 0; }
+.module-item, .lesson-item {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: .375rem; /* Bootstrap's default card/input border-radius */
+    padding: 1.25rem; /* Bootstrap card body padding */
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease-in-out;
+}
+.module-item:hover, .lesson-item:hover { box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.1); }
+.module-item h3, .lesson-item h4 { margin-top: 0; margin-bottom: .75rem; }
+
+/* Lesson Content Styling */
+.lesson-content-text { background-color: #ffffff; padding: 20px; border-radius: 5px; border: 1px solid #ddd; margin-top: 15px; line-height: 1.6; }
+.lesson-content-video, .lesson-content-image { margin-top: 15px; text-align: center; }
+.lesson-content-video iframe, .lesson-content-image img { max-width: 100%; border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+/* Quiz form fieldset */
+fieldset {
+    border: 1px solid #ddd !important; /* Ensure it's visible */
+    padding: 1.5rem !important; /* More padding */
+    margin-bottom: 1.5rem !important;
+    border-radius: .375rem !important;
+}
+legend {
+    padding: 0 .5rem; /* Give some space around legend text */
+    font-weight: 600 !important;
+    width: auto !important; /* Important for Bootstrap 5 legend */
+    font-size: 1.2rem !important; /* Slightly smaller than h3 */
+    border-bottom: none !important; /* Remove duplicate border if fieldset has one */
+}
+
+/* Action links in tables */
+.action-links a {
+    margin-right: 0.5rem;
+}
+.action-links a:last-child {
+    margin-right: 0;
+}
+
+/* Ensure button-link class (legacy) uses Bootstrap styles */
+.button-link {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    background-color: #0d6efd; /* Primary */
+    border: 1px solid #0d6efd;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.button-link:hover {
+    color: #fff;
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+.button-link.edit, .button-link.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+.button-link.edit:hover, .button-link.btn-warning:hover {
+    background-color: #ffca2c;
+    border-color: #ffc720;
+    color: #000;
+}
+.button-link.delete, .button-link.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+.button-link.delete:hover, .button-link.btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+.button-link.manage, .button-link.btn-info { /* Changed manage to info */
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+    color: #000;
+}
+.button-link.manage:hover, .button-link.btn-info:hover {
+    background-color: #31d2f2;
+    border-color: #25cff2;
+    color: #000;
+}
+.button-link.success, .button-link.btn-success {
+     background-color: #198754;
+    border-color: #198754;
+}
+.button-link.success:hover, .button-link.btn-success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+.button-link.secondary, .button-link.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.button-link.secondary:hover, .button-link.btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}

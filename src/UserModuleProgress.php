@@ -232,5 +232,30 @@ class UserModuleProgress {
             return [];
         }
     }
+
+    /**
+     * Counts the number of 'passed' modules for a specific user.
+     * Considers only modules that are currently 'active' in the system.
+     *
+     * @param int $user_id
+     * @return int Count of passed (and active) modules.
+     */
+    public function getCountPassedModulesForUser($user_id) {
+        $sql = "SELECT COUNT(ump.module_id)
+                FROM user_module_progress ump
+                JOIN modules m ON ump.module_id = m.module_id
+                WHERE ump.user_id = :user_id
+                AND ump.status = 'passed'
+                AND m.status = 'active'"; // Ensure we only count 'active' modules as passed
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return (int)$stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error counting passed modules for user: " . $e->getMessage());
+            return 0;
+        }
+    }
 }
 ?>

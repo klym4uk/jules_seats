@@ -116,95 +116,102 @@ $lessonsForModule = $lessonHandler->getLessonsByModuleId($current_module_id);
 include_once '../../src/includes/admin_header.php';
 ?>
 
-<p><a href="manage_modules.php" class="button-link" style="background-color: #7f8c8d;">&laquo; Back to Modules</a></p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Lessons for: <em><?php echo escape_html($current_module->title); ?></em></h1>
+    <a href="manage_modules.php" class="btn btn-secondary">&laquo; Back to Modules</a>
+</div>
 
-<?php if ($edit_lesson_data): ?>
-<div class="edit-form-container">
-    <h3>Edit Lesson: "<?php echo escape_html($edit_lesson_data->title); ?>"</h3>
-<?php else: ?>
-    <h3>Create New Lesson for "<?php echo escape_html($current_module->title); ?>"</h3>
-<?php endif; ?>
 
-<form action="manage_lessons.php?module_id=<?php echo $current_module_id; ?>" method="POST">
-    <!-- <input type="hidden" name="csrf_token" value="<?php // echo $_SESSION['csrf_token']; ?>"> -->
-    <input type="hidden" name="module_id" value="<?php echo $current_module_id; ?>">
-    <?php if ($edit_lesson_data): ?>
-        <input type="hidden" name="lesson_id" value="<?php echo escape_html($edit_lesson_data->lesson_id); ?>">
-    <?php endif; ?>
+<div class="card <?php echo $edit_lesson_data ? 'border-primary' : 'border-secondary'; ?> mb-4">
+    <div class="card-header">
+        <h3 class="mb-0"><?php echo $edit_lesson_data ? 'Edit Lesson: ' . escape_html($edit_lesson_data->title) : 'Create New Lesson'; ?></h3>
+    </div>
+    <div class="card-body">
+        <form action="manage_lessons.php?module_id=<?php echo $current_module_id; ?>" method="POST">
+            <input type="hidden" name="module_id" value="<?php echo $current_module_id; ?>">
+            <?php if ($edit_lesson_data): ?>
+                <input type="hidden" name="lesson_id" value="<?php echo escape_html($edit_lesson_data->lesson_id); ?>">
+            <?php endif; ?>
 
-    <div>
-        <label for="title">Lesson Title:</label>
-        <input type="text" id="title" name="title" value="<?php echo escape_html($edit_lesson_data->title ?? ''); ?>" required>
-    </div>
-    <div>
-        <label for="order_in_module">Order in Module (e.g., 1, 2, 3):</label>
-        <input type="number" id="order_in_module" name="order_in_module" value="<?php echo escape_html($edit_lesson_data->order_in_module ?? '0'); ?>" required min="0">
-    </div>
-    <div>
-        <label for="content_type">Content Type:</label>
-        <select id="content_type" name="content_type" required onchange="toggleContentFields()">
-            <option value="text" <?php echo (isset($edit_lesson_data->content_type) && $edit_lesson_data->content_type == 'text') ? 'selected' : ''; ?>>Text</option>
-            <option value="video" <?php echo (isset($edit_lesson_data->content_type) && $edit_lesson_data->content_type == 'video') ? 'selected' : ''; ?>>Video URL</option>
-            <option value="image" <?php echo (isset($edit_lesson_data->content_type) && $edit_lesson_data->content_type == 'image') ? 'selected' : ''; ?>>Image URL</option>
-        </select>
-    </div>
-    <div id="content_text_field">
-        <label for="content_text">Content (Text):</label>
-        <textarea id="content_text" name="content_text" rows="5"><?php echo escape_html($edit_lesson_data->content_text ?? ''); ?></textarea>
-    </div>
-    <div id="content_url_field">
-        <label for="content_url">Content URL (for Video/Image):</label>
-        <input type="text" id="content_url" name="content_url" value="<?php echo escape_html($edit_lesson_data->content_url ?? ''); ?>" placeholder="https://example.com/resource">
-    </div>
+            <div class="mb-3">
+                <label for="title" class="form-label">Lesson Title:</label>
+                <input type="text" class="form-control" id="title" name="title" value="<?php echo escape_html($edit_lesson_data->title ?? ''); ?>" required>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="order_in_module" class="form-label">Order in Module:</label>
+                    <input type="number" class="form-control" id="order_in_module" name="order_in_module" value="<?php echo escape_html($edit_lesson_data->order_in_module ?? '0'); ?>" required min="0">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="content_type" class="form-label">Content Type:</label>
+                    <select class="form-select" id="content_type" name="content_type" required onchange="toggleContentFields()">
+                        <option value="text" <?php echo (isset($edit_lesson_data->content_type) && $edit_lesson_data->content_type == 'text') ? 'selected' : ''; ?>>Text</option>
+                        <option value="video" <?php echo (isset($edit_lesson_data->content_type) && $edit_lesson_data->content_type == 'video') ? 'selected' : ''; ?>>Video URL</option>
+                        <option value="image" <?php echo (isset($edit_lesson_data->content_type) && $edit_lesson_data->content_type == 'image') ? 'selected' : ''; ?>>Image URL</option>
+                    </select>
+                </div>
+            </div>
 
-    <button type="submit"><?php echo $form_button_text; ?></button>
-    <?php if ($edit_lesson_data): ?>
-        <a href="manage_lessons.php?module_id=<?php echo $current_module_id; ?>" class="button-link" style="background-color: #7f8c8d; margin-left:10px;">Cancel Edit</a>
-    <?php endif; ?>
-</form>
-<?php if ($edit_lesson_data) echo '</div>'; // End edit-form-container ?>
+            <div class="mb-3" id="content_text_field">
+                <label for="content_text" class="form-label">Content (Text):</label>
+                <textarea class="form-control" id="content_text" name="content_text" rows="5"><?php echo escape_html($edit_lesson_data->content_text ?? ''); ?></textarea>
+            </div>
+            <div class="mb-3" id="content_url_field">
+                <label for="content_url" class="form-label">Content URL (for Video/Image):</label>
+                <input type="text" class="form-control" id="content_url" name="content_url" value="<?php echo escape_html($edit_lesson_data->content_url ?? ''); ?>" placeholder="https://example.com/resource_url">
+            </div>
 
-<h2>Lessons in "<?php echo escape_html($current_module->title); ?>"</h2>
+            <button type="submit" class="btn <?php echo $edit_lesson_data ? 'btn-primary' : 'btn-success'; ?>"><?php echo $form_button_text; ?></button>
+            <?php if ($edit_lesson_data): ?>
+                <a href="manage_lessons.php?module_id=<?php echo $current_module_id; ?>" class="btn btn-secondary ms-2">Cancel Edit</a>
+            <?php endif; ?>
+        </form>
+    </div>
+</div>
+
+<h2 class="mt-4 mb-3">Lessons in "<?php echo escape_html($current_module->title); ?>"</h2>
 <?php if (empty($lessonsForModule)): ?>
-    <p>No lessons found for this module. Create one above!</p>
+    <div class="alert alert-info">No lessons found for this module. Create one above!</div>
 <?php else: ?>
-    <table>
-        <thead>
-            <tr>
-                <th>Order</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Content Preview</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($lessonsForModule as $lesson): ?>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td><?php echo escape_html($lesson->order_in_module); ?></td>
-                    <td><?php echo escape_html($lesson->title); ?></td>
-                    <td><?php echo escape_html(ucfirst($lesson->content_type)); ?></td>
-                    <td>
-                        <?php
-                        if ($lesson->content_type == 'text') {
-                            echo escape_html(substr($lesson->content_text, 0, 50) . (strlen($lesson->content_text) > 50 ? '...' : ''));
-                        } elseif ($lesson->content_url) {
-                            echo '<a href="'.escape_html($lesson->content_url).'" target="_blank">View Resource</a>';
-                        } else {
-                            echo 'N/A';
-                        }
-                        ?>
-                    </td>
-                    <td class="action-links">
-                        <a href="manage_lessons.php?module_id=<?php echo $current_module_id; ?>&edit_lesson_id=<?php echo escape_html($lesson->lesson_id); ?>" class="button-link edit">Edit</a>
-                        <a href="manage_lessons.php?module_id=<?php echo $current_module_id; ?>&delete_lesson_id=<?php echo escape_html($lesson->lesson_id); ?>"
-                           class="button-link delete"
-                           onclick="return confirm('Are you sure you want to delete this lesson?');">Delete</a>
-                    </td>
+                    <th>Order</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Content Preview</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($lessonsForModule as $lesson): ?>
+                    <tr>
+                        <td><?php echo escape_html($lesson->order_in_module); ?></td>
+                        <td><?php echo escape_html($lesson->title); ?></td>
+                        <td><?php echo escape_html(ucfirst($lesson->content_type)); ?></td>
+                        <td>
+                            <?php
+                            if ($lesson->content_type == 'text') {
+                                echo escape_html(substr($lesson->content_text, 0, 70) . (strlen($lesson->content_text) > 70 ? '...' : ''));
+                            } elseif ($lesson->content_url) {
+                                echo '<a href="'.escape_html($lesson->content_url).'" target="_blank" rel="noopener noreferrer">View Resource</a>';
+                            } else {
+                                echo 'N/A';
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <a href="manage_lessons.php?module_id=<?php echo $current_module_id; ?>&edit_lesson_id=<?php echo escape_html($lesson->lesson_id); ?>" class="btn btn-sm btn-warning me-1">Edit</a>
+                            <a href="manage_lessons.php?module_id=<?php echo $current_module_id; ?>&delete_lesson_id=<?php echo escape_html($lesson->lesson_id); ?>"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this lesson?');">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 <?php endif; ?>
 
 <script>
@@ -217,29 +224,31 @@ function toggleContentFields() {
 
     if (contentType === 'text') {
         textField.style.display = 'block';
-        textInput.required = true;
+        textInput.required = true; // Only text is required for text type
         urlField.style.display = 'none';
         urlInput.required = false;
+        urlInput.value = ''; // Clear URL field
     } else if (contentType === 'video' || contentType === 'image') {
         textField.style.display = 'none';
         textInput.required = false;
+        textInput.value = ''; // Clear text field
         urlField.style.display = 'block';
-        urlInput.required = true;
-    } else {
+        urlInput.required = true; // Only URL is required for video/image
+    } else { // Should not happen with current options
         textField.style.display = 'none';
         textInput.required = false;
         urlField.style.display = 'none';
         urlInput.required = false;
     }
 }
-// Initial call to set correct fields on page load (especially for edit)
+// Initial call to set correct fields on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleContentFields();
 });
 </script>
 
 <?php
-echo "</main>"; // Close main.container from header
+echo "</div>"; // Close .container from admin_header.php
 ob_end_flush();
 ?>
 </body>

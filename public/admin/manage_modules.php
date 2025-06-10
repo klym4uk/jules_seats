@@ -87,94 +87,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 // $_SESSION['csrf_token_get'] = bin2hex(random_bytes(32)); // For GET actions like delete
 
 $allModules = $moduleHandler->getAllModules();
-include_once '../../src/includes/admin_header.php'; // Header includes message display
+include_once '../../src/includes/admin_header.php';
 ?>
 
-<?php if ($edit_module_data): ?>
-<div class="edit-form-container">
-    <h3>Edit Module: <?php echo escape_html($edit_module_data->title); ?></h3>
-<?php else: ?>
-    <h3>Create New Module</h3>
-<?php endif; ?>
-
-<form action="manage_modules.php" method="POST">
-    <!-- <input type="hidden" name="csrf_token" value="<?php // echo $_SESSION['csrf_token']; ?>"> -->
-    <?php if ($edit_module_data): ?>
-        <input type="hidden" name="module_id" value="<?php echo escape_html($edit_module_data->module_id); ?>">
-    <?php endif; ?>
-
-    <div>
-        <label for="title">Module Title:</label>
-        <input type="text" id="title" name="title" value="<?php echo escape_html($edit_module_data->title ?? ''); ?>" required>
+<div class="card <?php echo $edit_module_data ? 'border-primary' : 'border-secondary'; ?> mb-4">
+    <div class="card-header">
+        <h3 class="mb-0"><?php echo $edit_module_data ? 'Edit Module: ' . escape_html($edit_module_data->title) : 'Create New Module'; ?></h3>
     </div>
-    <div>
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" rows="4"><?php echo escape_html($edit_module_data->description ?? ''); ?></textarea>
+    <div class="card-body">
+        <form action="manage_modules.php" method="POST">
+            <!-- <input type="hidden" name="csrf_token" value="<?php // echo $_SESSION['csrf_token']; ?>"> -->
+            <?php if ($edit_module_data): ?>
+                <input type="hidden" name="module_id" value="<?php echo escape_html($edit_module_data->module_id); ?>">
+            <?php endif; ?>
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Module Title:</label>
+                <input type="text" class="form-control" id="title" name="title" value="<?php echo escape_html($edit_module_data->title ?? ''); ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="4"><?php echo escape_html($edit_module_data->description ?? ''); ?></textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="deadline" class="form-label">Deadline (Optional):</label>
+                    <input type="date" class="form-control" id="deadline" name="deadline" value="<?php echo escape_html($edit_module_data->deadline ?? ''); ?>">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status:</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="inactive" <?php echo (isset($edit_module_data->status) && $edit_module_data->status == 'inactive') ? 'selected' : ''; ?>>Inactive</option>
+                        <option value="active" <?php echo (isset($edit_module_data->status) && $edit_module_data->status == 'active') ? 'selected' : ''; ?>>Active</option>
+                        <option value="archived" <?php echo (isset($edit_module_data->status) && $edit_module_data->status == 'archived') ? 'selected' : ''; ?>>Archived</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn <?php echo $edit_module_data ? 'btn-primary' : 'btn-success'; ?>"><?php echo $form_button_text; ?></button>
+            <?php if ($edit_module_data): ?>
+                <a href="manage_modules.php" class="btn btn-secondary ms-2">Cancel Edit</a>
+            <?php endif; ?>
+        </form>
     </div>
-    <div>
-        <label for="deadline">Deadline (Optional):</label>
-        <input type="date" id="deadline" name="deadline" value="<?php echo escape_html($edit_module_data->deadline ?? ''); ?>">
-    </div>
-    <div>
-        <label for="status">Status:</label>
-        <select id="status" name="status" required>
-            <option value="inactive" <?php echo (isset($edit_module_data->status) && $edit_module_data->status == 'inactive') ? 'selected' : ''; ?>>Inactive</option>
-            <option value="active" <?php echo (isset($edit_module_data->status) && $edit_module_data->status == 'active') ? 'selected' : ''; ?>>Active</option>
-            <option value="archived" <?php echo (isset($edit_module_data->status) && $edit_module_data->status == 'archived') ? 'selected' : ''; ?>>Archived</option>
-        </select>
-    </div>
-    <button type="submit"><?php echo $form_button_text; ?></button>
-    <?php if ($edit_module_data): ?>
-        <a href="manage_modules.php" class="button-link" style="background-color: #7f8c8d; margin-left:10px;">Cancel Edit</a>
-    <?php endif; ?>
-</form>
-<?php if ($edit_module_data) echo '</div>'; // End edit-form-container ?>
+</div>
 
 
-<h2>Existing Modules</h2>
+<h2 class="mt-4 mb-3">Existing Modules</h2>
 <?php if (empty($allModules)): ?>
-    <p>No modules found. Create one above!</p>
+    <div class="alert alert-info">No modules found. Create one above!</div>
 <?php else: ?>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($allModules as $module): ?>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td><?php echo escape_html($module->module_id); ?></td>
-                    <td><?php echo escape_html($module->title); ?></td>
-                    <td><?php echo escape_html(substr($module->description, 0, 50) . (strlen($module->description) > 50 ? '...' : '')); ?></td>
-                    <td><?php echo escape_html($module->deadline ? date('M j, Y', strtotime($module->deadline)) : 'N/A'); ?></td>
-                    <td><?php echo escape_html(ucfirst($module->status)); ?></td>
-                    <td><?php echo escape_html(date('Y-m-d H:i', strtotime($module->created_at))); ?></td>
-                    <td><?php echo escape_html(date('Y-m-d H:i', strtotime($module->updated_at))); ?></td>
-                    <td class="action-links">
-                        <a href="manage_lessons.php?module_id=<?php echo escape_html($module->module_id); ?>" class="button-link manage">Manage Lessons</a>
-                        <a href="manage_quizzes.php?module_id=<?php echo escape_html($module->module_id); ?>" class="button-link manage" style="background-color:#9b59b6;">Manage Quizzes</a> <!-- Placeholder -->
-                        <a href="manage_modules.php?edit_id=<?php echo escape_html($module->module_id); ?>" class="button-link edit">Edit</a>
-                        <a href="manage_modules.php?delete_id=<?php echo escape_html($module->module_id); ?>&csrf_token_get=<?php // echo $_SESSION['csrf_token_get']; ?>"
-                           class="button-link delete"
-                           onclick="return confirm('Are you sure you want to delete this module? This may also delete related lessons and quizzes.');">Delete</a>
-                    </td>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($allModules as $module): ?>
+                    <tr>
+                        <td><?php echo escape_html($module->module_id); ?></td>
+                        <td><?php echo escape_html($module->title); ?></td>
+                        <td><?php echo escape_html(substr($module->description, 0, 50) . (strlen($module->description) > 50 ? '...' : '')); ?></td>
+                        <td><?php echo escape_html($module->deadline ? date('M j, Y', strtotime($module->deadline)) : 'N/A'); ?></td>
+                        <td><span class="badge bg-<?php echo ($module->status === 'active' ? 'success' : ($module->status === 'archived' ? 'secondary' : 'warning text-dark')); ?>"><?php echo escape_html(ucfirst($module->status)); ?></span></td>
+                        <td><?php echo escape_html(date('Y-m-d H:i', strtotime($module->created_at))); ?></td>
+                        <td><?php echo escape_html(date('Y-m-d H:i', strtotime($module->updated_at))); ?></td>
+                        <td>
+                            <a href="manage_lessons.php?module_id=<?php echo escape_html($module->module_id); ?>" class="btn btn-sm btn-info mb-1">Lessons</a>
+                            <a href="manage_quizzes.php?module_id=<?php echo escape_html($module->module_id); ?>" class="btn btn-sm btn-purple mb-1" style="background-color:#6f42c1; color:white;">Quizzes</a>
+                            <a href="manage_modules.php?edit_id=<?php echo escape_html($module->module_id); ?>" class="btn btn-sm btn-warning mb-1">Edit</a>
+                            <a href="manage_modules.php?delete_id=<?php echo escape_html($module->module_id); ?>&csrf_token_get=<?php // echo $_SESSION['csrf_token_get']; ?>"
+                               class="btn btn-sm btn-danger mb-1"
+                               onclick="return confirm('Are you sure you want to delete this module? This may also delete related lessons and quizzes.');">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 <?php endif; ?>
 
 <?php
-echo "</main>"; // Close main.container from header
-// include_once '../../src/includes/admin_footer.php';
+echo "</div>"; // Close .container from admin_header.php
 ob_end_flush();
 ?>
 </body>
