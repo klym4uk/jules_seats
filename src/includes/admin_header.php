@@ -85,7 +85,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="users.php" <?php if($current_page == 'users.php') echo 'class="active"'; ?>>Users</a>
         <a href="manage_modules.php" <?php if($current_page == 'manage_modules.php' || $current_page == 'manage_lessons.php' || $current_page == 'manage_quizzes.php'  || $current_page == 'module_progress_overview.php' || $current_page == 'view_module_progress_detail.php') echo 'class="active"'; ?>>Modules & Training</a>
         <a href="user_progress_overview.php" <?php if($current_page == 'user_progress_overview.php' || $current_page == 'view_employee_progress.php') echo 'class="active"'; ?>>User Progress</a>
-        <!-- Add more links as needed, e.g., for reports -->
+        <a href="reports.php" <?php if($current_page == 'reports.php' || $current_page == 'view_user_progress_report.php' || $current_page == 'view_quiz_results_report.php') echo 'class="active"'; ?>>Reports</a>
     </nav>
     <div class="user-info">
         <span>Welcome, <?php echo escape_html($_SESSION['first_name'] ?? 'Admin'); ?>!</span>

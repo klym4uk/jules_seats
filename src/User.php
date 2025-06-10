@@ -81,11 +81,26 @@ class User {
     /**
      * Retrieves all users from the database.
      *
+     * @param string|null $role Optional role to filter by (e.g., 'Employee', 'Admin').
      * @return array An array of user objects.
      */
-    public function getAllUsers() {
-        $stmt = $this->pdo->query("SELECT user_id, email, first_name, last_name, role, created_at, last_login_at FROM users ORDER BY created_at DESC");
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    public function getAllUsers($role = null) {
+        $sql = "SELECT user_id, email, first_name, last_name, role, created_at, last_login_at FROM users";
+        $params = [];
+        if ($role) {
+            $sql .= " WHERE role = :role";
+            $params[':role'] = $role;
+        }
+        $sql .= " ORDER BY created_at DESC";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            error_log("Error fetching all users: " . $e->getMessage());
+            return [];
+        }
     }
 
     /**
