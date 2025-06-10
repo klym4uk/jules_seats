@@ -40,83 +40,111 @@ if (isset($_GET['quiz_id']) && filter_var($_GET['quiz_id'], FILTER_VALIDATE_INT)
 
 include_once '../../src/includes/admin_header.php';
 ?>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0"><?php echo $page_title; ?></h1>
+    <a href="reports.php" class="btn btn-secondary">&laquo; Back to Reports</a>
+</div>
 
-<p><a href="reports.php" class="button-link secondary">&laquo; Back to Reports</a></p>
-<h1><?php echo $page_title; ?></h1>
-
-<form action="view_quiz_results_report.php" method="GET" style="margin-bottom: 20px;">
-    <label for="quiz_id" style="font-weight: bold;">Select a Quiz:</label>
-    <select name="quiz_id" id="quiz_id" onchange="this.form.submit()" style="padding: 8px; margin-right: 10px; border-radius: 4px;">
-        <option value="">-- Choose a Quiz --</option>
-        <?php foreach ($allQuizzes as $quiz_opt): ?>
-            <option value="<?php echo escape_html($quiz_opt->quiz_id); ?>" <?php if ($selected_quiz_id == $quiz_opt->quiz_id) echo 'selected'; ?>>
-                <?php echo escape_html($quiz_opt->title . " (Module: " . $quiz_opt->module_title . ")"); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <noscript><button type="submit">View Report</button></noscript>
+<form action="view_quiz_results_report.php" method="GET" class="mb-4 p-3 border rounded bg-light">
+    <div class="row align-items-end">
+        <div class="col-md-8">
+            <label for="quiz_id" class="form-label fw-bold">Select a Quiz:</label>
+            <select name="quiz_id" id="quiz_id" class="form-select form-select-lg">
+                <option value="">-- Choose a Quiz --</option>
+                <?php foreach ($allQuizzes as $quiz_opt): ?>
+                    <option value="<?php echo escape_html($quiz_opt->quiz_id); ?>" <?php if ($selected_quiz_id == $quiz_opt->quiz_id) echo 'selected'; ?>>
+                        <?php echo escape_html($quiz_opt->title . " (Module: " . $quiz_opt->module_title . ")"); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary btn-lg w-100">View Report</button>
+        </div>
+    </div>
 </form>
 
 <?php if ($selected_quiz_id && $quiz_details): ?>
-    <h2>Report for: <?php echo escape_html($quiz_details->title); ?></h2>
-    <p>Module: <?php echo escape_html($quiz_details->module_title); ?></p>
+    <h2 class="mb-3">Report for: <span class="fw-normal fst-italic"><?php echo escape_html($quiz_details->title); ?></span></h2>
+    <p class="text-muted">Module: <?php echo escape_html($quiz_details->module_title); ?></p>
 
-    <div style="margin-bottom: 20px; display:flex; gap: 20px;">
-        <div class="stat-card" style="background-color: #f0f0f0; padding: 15px; border-radius: 5px; text-align:center;">
-            <strong>Average Score:</strong> <?php echo round($average_score, 2); ?>%
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Average Score</h5>
+                    <p class="card-text display-6"><?php echo round($average_score, 2); ?>%</p>
+                </div>
+            </div>
         </div>
-        <div class="stat-card" style="background-color: #f0f0f0; padding: 15px; border-radius: 5px; text-align:center;">
-            <strong>Pass Rate:</strong> <?php echo round($pass_rate, 2); ?>%
-            (Threshold: <?php echo escape_html($quiz_details->passing_threshold); ?>%)
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Pass Rate</h5>
+                    <p class="card-text display-6"><?php echo round($pass_rate, 2); ?>%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+             <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Passing Threshold</h5>
+                    <p class="card-text display-6"><?php echo escape_html($quiz_details->passing_threshold); ?>%</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <p style="margin-bottom: 20px;">
-        <a href="export_handler.php?report=quiz_results&quiz_id=<?php echo $selected_quiz_id; ?>" class="button-link success">Export These Results to CSV</a>
-    </p>
+    <div class="mb-3">
+        <a href="export_handler.php?report=quiz_results&quiz_id=<?php echo $selected_quiz_id; ?>" class="btn btn-success">
+             <i class="fas fa-file-csv me-2"></i>Export These Results to CSV
+        </a>
+    </div>
 
     <?php if (empty($attempts_details)): ?>
-        <div class="message info">No attempts found for this quiz yet.</div>
+        <div class="alert alert-info">No attempts found for this quiz yet.</div>
     <?php else: ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th>Email</th>
-                    <th>Attempt #</th>
-                    <th>Score (%)</th>
-                    <th>Status</th>
-                    <th>Attempt Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($attempts_details as $attempt): ?>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
                     <tr>
-                        <td><?php echo escape_html($attempt->first_name . ' ' . $attempt->last_name); ?></td>
-                        <td><?php echo escape_html($attempt->email); ?></td>
-                        <td><?php echo escape_html($attempt->attempt_number); ?></td>
-                        <td><?php echo escape_html($attempt->score); ?>%</td>
-                        <td>
-                            <?php if ($attempt->passed): ?>
-                                <span style="color: green;">Passed</span>
-                            <?php else: ?>
-                                <span style="color: red;">Failed</span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?php echo escape_html($attempt->completed_at ? date('Y-m-d H:i:s', strtotime($attempt->completed_at)) : 'In Progress'); ?></td>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Attempt #</th>
+                        <th>Score (%)</th>
+                        <th>Status</th>
+                        <th>Attempt Date</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($attempts_details as $attempt): ?>
+                        <tr>
+                            <td><?php echo escape_html($attempt->first_name . ' ' . $attempt->last_name); ?></td>
+                            <td><?php echo escape_html($attempt->email); ?></td>
+                            <td><?php echo escape_html($attempt->attempt_number); ?></td>
+                            <td><?php echo escape_html($attempt->score); ?>%</td>
+                            <td>
+                                <?php if ($attempt->passed): ?>
+                                    <span class="badge bg-success">Passed</span>
+                                <?php else: ?>
+                                    <span class="badge bg-danger">Failed</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo escape_html($attempt->completed_at ? date('Y-m-d H:i:s', strtotime($attempt->completed_at)) : 'In Progress'); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
-<?php elseif (isset($_GET['quiz_id']) && !$quiz_details) : // if quiz_id was in URL but not found?>
-    <div class="message error">The selected quiz (ID: <?php echo escape_html($_GET['quiz_id']); ?>) could not be found. Please choose a valid quiz from the list.</div>
-<?php else: ?>
-    <p class="message info">Please select a quiz from the dropdown above to view its results.</p>
+<?php elseif (isset($_GET['quiz_id']) && $_GET['quiz_id'] !== '' && !$quiz_details) : ?>
+    <div class="alert alert-danger">The selected quiz (ID: <?php echo escape_html($_GET['quiz_id']); ?>) could not be found. Please choose a valid quiz from the list.</div>
+<?php elseif (!isset($_GET['quiz_id']) || $_GET['quiz_id'] === ''):?>
+    <div class="alert alert-info">Please select a quiz from the dropdown above to view its results.</div>
 <?php endif; ?>
 
 <?php
-echo "</main>"; // Close main.container from header
+echo "</div>"; // Close .container from admin_header.php
 ob_end_flush();
 ?>
 </body>

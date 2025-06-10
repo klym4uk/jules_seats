@@ -88,72 +88,98 @@ if ($current_lesson_index < (count($all_lessons_in_module) - 1) && $current_less
 
 
 include_once '../../src/includes/employee_header.php';
+
+$lesson_status_key = strtolower($lesson_progress->status ?? 'not_viewed');
+$lesson_badge_bg_class = 'bg-light text-dark'; // Default for not_viewed
+$icon_status = '<i class="fas fa-eye-slash me-2"></i>'; // Placeholder
+
+switch ($lesson_status_key) {
+    case 'viewed': $lesson_badge_bg_class = 'bg-warning text-dark'; $icon_status = '<i class="fas fa-eye me-2"></i>'; break;
+    case 'completed': $lesson_badge_bg_class = 'bg-success'; $icon_status = '<i class="fas fa-check-circle me-2"></i>'; break;
+}
 ?>
-
-<p><a href="view_module.php?module_id=<?php echo escape_html($lesson->module_id); ?>" class="e-button secondary">&laquo; Back to Module: <?php echo escape_html($module->title); ?></a></p>
-
-<h1><?php echo escape_html($lesson->title); ?></h1>
-<p class="e-button secondary" style="margin-bottom:20px; display:inline-block;">Status:
-    <span class="status-badge status-<?php echo escape_html(strtolower($lesson_progress->status ?? 'not_viewed')); ?>">
-        <?php echo escape_html(ucwords(str_replace('_', ' ', $lesson_progress->status ?? 'Not Viewed'))); ?>
-    </span>
-</p>
-
-<div class="lesson-content">
-    <?php if ($lesson->content_type === 'text'): ?>
-        <div class="lesson-content-text">
-            <?php echo nl2br(escape_html($lesson->content_text)); // Using escape_html for safety, consider Markdown parsing for rich text ?>
-        </div>
-    <?php elseif ($lesson->content_type === 'video' && !empty($lesson->content_url)): ?>
-        <div class="lesson-content-video">
-            <?php
-            // Basic YouTube embed logic (can be expanded for Vimeo, etc.)
-            if (strpos($lesson->content_url, 'youtube.com/watch?v=') !== false) {
-                $video_id = substr($lesson->content_url, strpos($lesson->content_url, 'v=') + 2);
-                $embed_url = 'https://www.youtube.com/embed/' . $video_id;
-                echo '<iframe width="560" height="315" src="' . escape_html($embed_url) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-            } elseif (strpos($lesson->content_url, 'youtu.be/') !== false) {
-                $video_id = substr($lesson->content_url, strpos($lesson->content_url, 'youtu.be/') + 9);
-                $embed_url = 'https://www.youtube.com/embed/' . $video_id;
-                echo '<iframe width="560" height="315" src="' . escape_html($embed_url) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-            } else {
-                echo '<p>Video URL is not a supported format for embedding. <a href="'.escape_html($lesson->content_url).'" target="_blank">Watch video</a></p>';
-            }
-            ?>
-        </div>
-    <?php elseif ($lesson->content_type === 'image' && !empty($lesson->content_url)): ?>
-        <div class="lesson-content-image">
-            <img src="<?php echo escape_html($lesson->content_url); ?>" alt="<?php echo escape_html($lesson->title); ?>">
-        </div>
-    <?php else: ?>
-        <p class="message info">No content available for this lesson type or URL is missing.</p>
-    <?php endif; ?>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0"><?php echo escape_html($lesson->title); ?></h1>
+    <a href="view_module.php?module_id=<?php echo escape_html($lesson->module_id); ?>" class="btn btn-outline-secondary">&laquo; Back to Module: <?php echo escape_html($module->title); ?></a>
 </div>
 
-<div style="margin-top: 30px; padding-top:20px; border-top: 1px solid #eee;">
+
+<div class="alert alert-light d-flex align-items-center" role="alert">
+   <?php // echo $icon_status; // Icon would show here ?>
+   <strong class="me-2">Status:</strong>
+   <span class="status-badge <?php echo $lesson_badge_bg_class; ?>">
+        <?php echo escape_html(ucwords(str_replace('_', ' ', $lesson_progress->status ?? 'Not Viewed'))); ?>
+   </span>
+</div>
+
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Lesson Content</h5>
+    </div>
+    <div class="card-body">
+        <?php if ($lesson->content_type === 'text'): ?>
+            <div class="lesson-content-text">
+                <?php echo nl2br(escape_html($lesson->content_text)); ?>
+            </div>
+        <?php elseif ($lesson->content_type === 'video' && !empty($lesson->content_url)): ?>
+            <div class="lesson-content-video embed-responsive embed-responsive-16by9">
+                <?php
+                if (strpos($lesson->content_url, 'youtube.com/watch?v=') !== false) {
+                    $video_id = substr($lesson->content_url, strpos($lesson->content_url, 'v=') + 2);
+                    $embed_url = 'https://www.youtube.com/embed/' . $video_id;
+                    echo '<iframe class="embed-responsive-item" src="' . escape_html($embed_url) . '" allowfullscreen style="width:100%; min-height: 400px;"></iframe>';
+                } elseif (strpos($lesson->content_url, 'youtu.be/') !== false) {
+                    $video_id = substr($lesson->content_url, strpos($lesson->content_url, 'youtu.be/') + 9);
+                    $embed_url = 'https://www.youtube.com/embed/' . $video_id;
+                    echo '<iframe class="embed-responsive-item" src="' . escape_html($embed_url) . '" allowfullscreen style="width:100%; min-height: 400px;"></iframe>';
+                } else {
+                    echo '<div class="alert alert-warning">Video URL is not a supported YouTube format for embedding. <a href="'.escape_html($lesson->content_url).'" target="_blank" class="alert-link">Watch video directly</a></div>';
+                }
+                ?>
+            </div>
+        <?php elseif ($lesson->content_type === 'image' && !empty($lesson->content_url)): ?>
+            <div class="lesson-content-image text-center">
+                <img src="<?php echo escape_html($lesson->content_url); ?>" alt="<?php echo escape_html($lesson->title); ?>" class="img-fluid rounded shadow-sm" style="max-height: 600px;">
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info">No content available for this lesson type or URL is missing.</div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<div class="mt-4 mb-3 text-center">
     <?php if ($lesson_progress && $lesson_progress->status !== 'completed'): ?>
-        <form action="view_lesson.php?lesson_id=<?php echo $lesson_id; ?>" method="POST" style="display: inline;">
-            <!-- CSRF token -->
+        <form action="view_lesson.php?lesson_id=<?php echo $lesson_id; ?>" method="POST" class="d-inline-block">
             <input type="hidden" name="action" value="mark_complete">
-            <button type="submit" class="e-button success">Mark as Complete</button>
+            <button type="submit" class="btn btn-success btn-lg">
+                 <i class="fas fa-check-square me-2"></i>Mark as Complete
+            </button>
         </form>
     <?php else: ?>
-        <p class="message success">You have completed this lesson.</p>
+        <div class="alert alert-success d-inline-block"><i class="fas fa-check-circle me-2"></i>You have completed this lesson.</div>
     <?php endif; ?>
 </div>
 
-<div style="margin-top: 30px; overflow: hidden;">
-    <?php if ($prev_lesson_id): ?>
-        <a href="view_lesson.php?lesson_id=<?php echo $prev_lesson_id; ?>" class="e-button" style="float: left;">&laquo; Previous Lesson</a>
-    <?php endif; ?>
-    <?php if ($next_lesson_id): ?>
-        <a href="view_lesson.php?lesson_id=<?php echo $next_lesson_id; ?>" class="e-button" style="float: right;">Next Lesson &raquo;</a>
-    <?php endif; ?>
-</div>
+<nav aria-label="Lesson navigation" class="mt-4">
+    <ul class="pagination justify-content-between">
+        <li class="page-item <?php if (!$prev_lesson_id) echo 'disabled'; ?>">
+            <a class="page-link" href="<?php if ($prev_lesson_id) echo 'view_lesson.php?lesson_id='.$prev_lesson_id; else echo '#'; ?>" tabindex="-1" aria-disabled="<?php echo !$prev_lesson_id ? 'true' : 'false'; ?>">
+                &laquo; Previous Lesson
+            </a>
+        </li>
+        <li class="page-item <?php if (!$next_lesson_id) echo 'disabled'; ?>">
+            <a class="page-link" href="<?php if ($next_lesson_id) echo 'view_lesson.php?lesson_id='.$next_lesson_id; else echo '#'; ?>">
+                Next Lesson &raquo;
+            </a>
+        </li>
+    </ul>
+</nav>
 
 
 <?php
-echo "</main>"; // Close main.e-container from header
+// The main container div is opened in employee_header.php and should be closed here.
+echo "</div>"; // Close .container from employee_header.php
 ob_end_flush();
 ?>
 </body>

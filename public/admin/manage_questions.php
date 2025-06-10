@@ -208,168 +208,173 @@ $questionsForQuiz = $questionHandler->getQuestionsByQuizId($current_quiz_id);
 include_once '../../src/includes/admin_header.php';
 ?>
 
-<p>
-    <a href="manage_quizzes.php?module_id=<?php echo $current_quiz->module_id; ?>" class="button-link" style="background-color: #7f8c8d;">&laquo; Back to Quizzes in "<?php echo escape_html($current_module->title); ?>"</a>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Questions for: <em><?php echo escape_html($current_quiz->title); ?></em></h1>
+    <a href="manage_quizzes.php?module_id=<?php echo $current_quiz->module_id; ?>" class="btn btn-secondary">&laquo; Back to Quizzes in "<?php echo escape_html($current_module->title); ?>"</a>
+</div>
+
 
 <!-- Question Create/Edit Form -->
-<div class="edit-form-container" id="question_form_container" <?php if ($managing_answers_for_question_id && !$edit_question_data) echo 'style="display:none;"';?>>
-    <h3><?php echo $edit_question_data && !$managing_answers_for_question_id ? 'Edit Question' : 'Add New Question'; ?> for "<?php echo escape_html($current_quiz->title); ?>"</h3>
-    <form action="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" method="POST">
-        <input type="hidden" name="form_type" value="question">
-        <!-- <input type="hidden" name="csrf_token" value="<?php // echo $_SESSION['csrf_token']; ?>"> -->
-        <?php if ($edit_question_data && !$managing_answers_for_question_id): ?>
-            <input type="hidden" name="question_id" value="<?php echo escape_html($edit_question_data->question_id); ?>">
-        <?php endif; ?>
+<div class="card mb-4 <?php if ($managing_answers_for_question_id && !$edit_question_data) echo 'd-none'; else echo ($edit_question_data && !$managing_answers_for_question_id ? 'border-primary' : 'border-secondary'); ?>" id="question_form_container">
+    <div class="card-header">
+        <h3 class="mb-0"><?php echo $edit_question_data && !$managing_answers_for_question_id ? 'Edit Question' : 'Add New Question'; ?></h3>
+    </div>
+    <div class="card-body">
+        <form action="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" method="POST">
+            <input type="hidden" name="form_type" value="question">
+            <?php if ($edit_question_data && !$managing_answers_for_question_id): ?>
+                <input type="hidden" name="question_id" value="<?php echo escape_html($edit_question_data->question_id); ?>">
+            <?php endif; ?>
 
-        <div>
-            <label for="question_text">Question Text:</label>
-            <textarea id="question_text" name="question_text" rows="3" required><?php echo escape_html($edit_question_data->question_text ?? ''); ?></textarea>
-        </div>
-        <div>
-            <label for="order_in_quiz">Order in Quiz:</label>
-            <input type="number" id="order_in_quiz" name="order_in_quiz" value="<?php echo escape_html($edit_question_data->order_in_quiz ?? count($questionsForQuiz)); ?>" required min="0">
-        </div>
-        <div>
-            <label for="question_type">Question Type:</label>
-            <select id="question_type" name="question_type">
-                <option value="single_choice" <?php echo (isset($edit_question_data->question_type) && $edit_question_data->question_type == 'single_choice') ? 'selected' : ''; ?>>Single Choice (Correct answer picked via radio button)</option>
-                <!-- <option value="multiple_choice" <?php // echo (isset($edit_question_data->question_type) && $edit_question_data->question_type == 'multiple_choice') ? 'selected' : ''; ?>>Multiple Choice (Correct answers via checkboxes)</option> -->
-            </select>
-        </div>
-        <button type="submit"><?php echo $edit_question_data && !$managing_answers_for_question_id ? 'Update Question' : 'Create Question'; ?></button>
-        <?php if ($edit_question_data && !$managing_answers_for_question_id): ?>
-             <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" class="button-link" style="background-color: #7f8c8d; margin-left:10px;">Cancel Edit</a>
-        <?php endif; ?>
-    </form>
+            <div class="mb-3">
+                <label for="question_text" class="form-label">Question Text:</label>
+                <textarea class="form-control" id="question_text" name="question_text" rows="3" required><?php echo escape_html($edit_question_data->question_text ?? ''); ?></textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="order_in_quiz" class="form-label">Order in Quiz:</label>
+                    <input type="number" class="form-control" id="order_in_quiz" name="order_in_quiz" value="<?php echo escape_html($edit_question_data->order_in_quiz ?? count($questionsForQuiz)); ?>" required min="0">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="question_type" class="form-label">Question Type:</label>
+                    <select class="form-select" id="question_type" name="question_type">
+                        <option value="single_choice" <?php echo (isset($edit_question_data->question_type) && $edit_question_data->question_type == 'single_choice') ? 'selected' : ''; ?>>Single Choice</option>
+                        <!-- Multiple choice UI for answers would need more work -->
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn <?php echo ($edit_question_data && !$managing_answers_for_question_id) ? 'btn-primary' : 'btn-success'; ?>"><?php echo $edit_question_data && !$managing_answers_for_question_id ? 'Update Question' : 'Create Question'; ?></button>
+            <?php if ($edit_question_data && !$managing_answers_for_question_id): ?>
+                 <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" class="btn btn-secondary ms-2">Cancel Edit</a>
+            <?php endif; ?>
+        </form>
+    </div>
 </div>
 
 
 <!-- List Existing Questions -->
-<h2>Questions in "<?php echo escape_html($current_quiz->title); ?>"</h2>
+<h2 class="mt-4 mb-3">Questions in "<?php echo escape_html($current_quiz->title); ?>"</h2>
 <?php if (empty($questionsForQuiz)): ?>
-    <p>No questions yet for this quiz. Add one above.</p>
+    <div class="alert alert-info">No questions yet for this quiz. Add one above.</div>
 <?php else: ?>
-    <table>
-        <thead>
-            <tr>
-                <th>Order</th>
-                <th>Question Text</th>
-                <th>Type</th>
-                <th>Answers</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($questionsForQuiz as $question):
-                $answers_for_this_question = $answerHandler->getAnswersByQuestionId($question->question_id);
-            ?>
-                <tr <?php if ($managing_answers_for_question_id == $question->question_id) echo 'style="background-color: #e0f2f7;"'; ?>>
-                    <td><?php echo escape_html($question->order_in_quiz); ?></td>
-                    <td><?php echo escape_html($question->question_text); ?></td>
-                    <td><?php echo escape_html(str_replace('_', ' ', ucfirst($question->question_type))); ?></td>
-                    <td><?php echo count($answers_for_this_question); ?></td>
-                    <td class="action-links">
-                        <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=manage_answers&question_id=<?php echo $question->question_id; ?>" class="button-link manage">Manage Answers</a>
-                        <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=edit_question&question_id=<?php echo $question->question_id; ?>" class="button-link edit">Edit Q</a>
-                        <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=delete_question&question_id=<?php echo $question->question_id; ?>" class="button-link delete" onclick="return confirm('Delete this question and its answers?');">Del Q</a>
-                    </td>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order</th>
+                    <th>Question Text</th>
+                    <th>Type</th>
+                    <th>Answers</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($questionsForQuiz as $question):
+                    $answers_for_this_question = $answerHandler->getAnswersByQuestionId($question->question_id);
+                ?>
+                    <tr class="<?php if ($managing_answers_for_question_id == $question->question_id) echo 'table-info'; ?>">
+                        <td><?php echo escape_html($question->order_in_quiz); ?></td>
+                        <td><?php echo escape_html($question->question_text); ?></td>
+                        <td><?php echo escape_html(str_replace('_', ' ', ucfirst($question->question_type))); ?></td>
+                        <td><?php echo count($answers_for_this_question); ?></td>
+                        <td>
+                            <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=manage_answers&question_id=<?php echo $question->question_id; ?>" class="btn btn-sm btn-success mb-1">Manage Answers</a>
+                            <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=edit_question&question_id=<?php echo $question->question_id; ?>" class="btn btn-sm btn-warning mb-1">Edit Q</a>
+                            <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=delete_question&question_id=<?php echo $question->question_id; ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Delete this question and its answers?');">Del Q</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 <?php endif; ?>
 
 
-<!-- Answer Management Section (shown if managing_answers_for_question_id is set) -->
-<?php if ($managing_answers_for_question_id && $edit_question_data): // $edit_question_data is loaded for the question whose answers are being managed ?>
-    <hr style="margin: 30px 0;">
-    <div id="answer_management_section" class="edit-form-container" style="border-color: #9b59b6;">
-        <h3>Manage Answers for Question <?php echo $edit_question_data->order_in_quiz+1; ?>: "<em><?php echo escape_html($edit_question_data->question_text); ?></em>"</h3>
+<!-- Answer Management Section -->
+<?php if ($managing_answers_for_question_id && $edit_question_data): ?>
+    <hr class="my-4">
+    <div id="answer_management_section" class="card border-success mb-4">
+        <div class="card-header bg-success text-white">
+             <h3 class="mb-0">Manage Answers for Question #<?php echo $edit_question_data->order_in_quiz; ?>: "<em><?php echo escape_html(substr($edit_question_data->question_text, 0, 50) . '...'); ?></em>"</h3>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Existing Answers:</h4>
+            <?php $answers = $answerHandler->getAnswersByQuestionId($managing_answers_for_question_id); ?>
+            <?php if (empty($answers)): ?>
+                <div class="alert alert-info">No answers yet for this question. Add one below.</div>
+            <?php else: ?>
+                <form action="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" method="POST" id="set_correct_answer_form">
+                    <input type="hidden" name="form_type" value="set_correct_answer">
+                    <input type="hidden" name="question_id_for_correct_answer" value="<?php echo $managing_answers_for_question_id; ?>">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead><tr><th style="width:10%">Correct?</th><th>Answer Text</th><th style="width:20%">Actions</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($answers as $ans): ?>
+                                <tr>
+                                    <td>
+                                        <?php if ($edit_question_data->question_type === 'single_choice'): ?>
+                                        <input class="form-check-input" type="radio" name="correct_answer_id_radio" value="<?php echo $ans->answer_id; ?>"
+                                               id="correct_ans_<?php echo $ans->answer_id; ?>"
+                                               <?php if ($ans->is_correct) echo 'checked'; ?>
+                                               onchange="document.getElementById('set_correct_answer_form').submit();"
+                                               title="Select this as the correct answer and submit">
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><label for="correct_ans_<?php echo $ans->answer_id; ?>"><?php echo escape_html($ans->answer_text); ?></label></td>
+                                    <td>
+                                        <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=edit_answer&question_id=<?php echo $managing_answers_for_question_id; ?>&answer_id=<?php echo $ans->answer_id; ?>#add_answer_form" class="btn btn-sm btn-outline-warning py-0 px-1">Edit</a>
+                                        <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=delete_answer&question_id=<?php echo $managing_answers_for_question_id; ?>&answer_id=<?php echo $ans->answer_id; ?>" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="return confirm('Delete this answer?');">Del</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            <?php endif; ?>
 
-        <h4>Existing Answers:</h4>
-        <?php $answers = $answerHandler->getAnswersByQuestionId($managing_answers_for_question_id); ?>
-        <?php if (empty($answers)): ?>
-            <p>No answers yet for this question. Add one below.</p>
-        <?php else: ?>
+            <hr>
+            <h4 id="add_answer_form" class="card-title mt-3"><?php echo $edit_answer_data ? 'Edit Answer Option' : 'Add New Answer Option'; ?>:</h4>
             <form action="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" method="POST">
-                <!-- <input type="hidden" name="csrf_token" value="<?php // echo $_SESSION['csrf_token']; ?>"> -->
-                <input type="hidden" name="form_type" value="set_correct_answer">
-                <input type="hidden" name="question_id_for_correct_answer" value="<?php echo $managing_answers_for_question_id; ?>">
-                <table>
-                    <thead><tr><th>Correct?</th><th>Answer Text</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <?php foreach ($answers as $ans): ?>
-                        <tr>
-                            <td>
-                                <?php if ($edit_question_data->question_type === 'single_choice'): ?>
-                                <input type="radio" name="correct_answer_id_radio" value="<?php echo $ans->answer_id; ?>"
-                                       <?php if ($ans->is_correct) echo 'checked'; ?>
-                                       onchange="this.form.submit();"
-                                       title="Select this as the correct answer and submit">
-                                <?php // For multiple_choice, you'd use checkboxes and a different update mechanism
-                                /* elseif ($edit_question_data->question_type === 'multiple_choice'): ?>
-                                <input type="checkbox" name="correct_answer_ids[]" value="<?php echo $ans->answer_id; ?>" <?php if ($ans->is_correct) echo 'checked'; ?>>
-                                <?php */
-                                endif; ?>
-                            </td>
-                            <td><?php echo escape_html($ans->answer_text); ?></td>
-                            <td class="action-links">
-                                <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=edit_answer&question_id=<?php echo $managing_answers_for_question_id; ?>&answer_id=<?php echo $ans->answer_id; ?>" class="button-link edit">Edit A</a>
-                                <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=delete_answer&question_id=<?php echo $managing_answers_for_question_id; ?>&answer_id=<?php echo $ans->answer_id; ?>" class="button-link delete" onclick="return confirm('Delete this answer?');">Del A</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php /* if ($edit_question_data->question_type === 'multiple_choice'): ?>
-                    <button type="submit">Update Correct Answers (for Multiple Choice)</button>
-                <?php endif; */ ?>
+                <input type="hidden" name="form_type" value="answer">
+                <input type="hidden" name="question_id_for_answer" value="<?php echo $managing_answers_for_question_id; ?>">
+                <?php if ($edit_answer_data): ?>
+                    <input type="hidden" name="answer_id" value="<?php echo $edit_answer_data->answer_id; ?>">
+                <?php endif; ?>
+
+                <div class="mb-3">
+                    <label for="answer_text" class="form-label">Answer Text:</label>
+                    <input type="text" class="form-control" id="answer_text" name="answer_text" value="<?php echo escape_html($edit_answer_data->answer_text ?? ''); ?>" required>
+                </div>
+
+                <?php if (!$edit_answer_data && $edit_question_data->question_type === 'single_choice'): ?>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="set_correct_new_answer" name="set_correct_new_answer" value="yes">
+                    <label class="form-check-label" for="set_correct_new_answer">Set this new answer as the correct one?</label>
+                    <div class="form-text">If checked, this will replace any existing correct answer for this single-choice question.</div>
+                </div>
+                <?php endif; ?>
+
+                <?php if ($edit_answer_data && $edit_question_data->question_type === 'single_choice'): ?>
+                <div class="mb-3 form-text">
+                    To change which answer is correct, use the radio buttons in the list above. This form only updates the answer text.
+                    <input type="radio" name="is_correct_existing_radio" value="<?php echo $edit_answer_data->answer_id; ?>" <?php if($edit_answer_data->is_correct) echo 'checked';?> style="display:none;">
+                </div>
+                <?php endif; ?>
+
+                <button type="submit" class="btn <?php echo $edit_answer_data ? 'btn-primary' : 'btn-success'; ?>"><?php echo $edit_answer_data ? 'Update Answer Text' : 'Add Answer'; ?></button>
+                <?php if ($edit_answer_data): ?>
+                    <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=manage_answers&question_id=<?php echo $managing_answers_for_question_id; ?>" class="btn btn-secondary ms-2">Cancel Edit Answer</a>
+                <?php endif; ?>
             </form>
-        <?php endif; ?>
-
-        <h4 style="margin-top: 20px;"><?php echo $edit_answer_data ? 'Edit Answer' : 'Add New Answer'; ?>:</h4>
-        <form action="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>" method="POST">
-            <!-- <input type="hidden" name="csrf_token" value="<?php // echo $_SESSION['csrf_token']; ?>"> -->
-            <input type="hidden" name="form_type" value="answer">
-            <input type="hidden" name="question_id_for_answer" value="<?php echo $managing_answers_for_question_id; ?>">
-            <?php if ($edit_answer_data): ?>
-                <input type="hidden" name="answer_id" value="<?php echo $edit_answer_data->answer_id; ?>">
-            <?php endif; ?>
-
-            <div>
-                <label for="answer_text">Answer Text:</label>
-                <input type="text" id="answer_text" name="answer_text" value="<?php echo escape_html($edit_answer_data->answer_text ?? ''); ?>" required>
-            </div>
-
-            <?php if (!$edit_answer_data && $edit_question_data->question_type === 'single_choice'): ?>
-            <div>
-                <input type="checkbox" id="set_correct_new_answer" name="set_correct_new_answer" value="yes">
-                <label for="set_correct_new_answer">Set this new answer as the correct one?</label>
-                <small>(If checked, this will replace any existing correct answer for this single-choice question.)</small>
-            </div>
-            <?php endif; ?>
-
-            <?php if ($edit_answer_data && $edit_question_data->question_type === 'single_choice'): ?>
-            <div>
-                <!-- Hidden radio button to pass the value if the current answer being edited is selected as correct -->
-                 <input type="radio" name="is_correct_existing_radio" value="<?php echo $edit_answer_data->answer_id; ?>" <?php if($edit_answer_data->is_correct) echo 'checked';?> style="display:none;">
-                 <p><small>To change which answer is correct, use the radio buttons in the list above.</small></p>
-            </div>
-            <?php endif; ?>
-
-
-            <button type="submit"><?php echo $edit_answer_data ? 'Update Answer Text' : 'Add Answer'; ?></button>
-            <?php if ($edit_answer_data): ?>
-                <a href="manage_questions.php?quiz_id=<?php echo $current_quiz_id; ?>&action=manage_answers&question_id=<?php echo $managing_answers_for_question_id; ?>" class="button-link" style="background-color: #7f8c8d; margin-left:10px;">Cancel Edit Answer</a>
-            <?php endif; ?>
-        </form>
+        </div>
     </div>
 <?php endif; ?>
 
 
 <?php
-echo "</main>"; // Close main.container from header
+echo "</div>"; // Close .container from admin_header.php
 ob_end_flush();
 ?>
 </body>

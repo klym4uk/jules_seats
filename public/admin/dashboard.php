@@ -57,56 +57,113 @@ if (count($allEmployees) > 0) {
 $percentageUsersPassedOneModule = ($totalEmployees > 0) ? round(($employeesWhoPassedAtLeastOneModule / $totalEmployees) * 100, 2) : 0;
 
 
-include_once '../../src/includes/admin_header.php'; // Include the new header
+include_once '../../src/includes/admin_header.php';
 ?>
 
-<h1>Welcome to the Admin Dashboard, <?php echo escape_html($_SESSION['first_name']); ?>!</h1>
+<div class="container-fluid px-4"> <!-- Using container-fluid for more width if desired, or stick to .container -->
+    <h1 class="mt-4">Admin Dashboard</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Overview & Statistics</li>
+    </ol>
 
-<p>This is your central hub for managing the SEATS application. Use the navigation above to manage users, modules, and track progress.</p>
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    Total Employees
+                    <div class="display-4"><?php echo $totalEmployees; ?></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="users.php">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-secondary text-white mb-4">
+                <div class="card-body">
+                    Total Admins
+                    <div class="display-4"><?php echo $totalAdmins; ?></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="users.php">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    Active Modules
+                    <div class="display-4"><?php echo $totalActiveModules; ?></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="manage_modules.php">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white mb-4"> <!-- Changed from Inactive Modules to User Passed Rate -->
+                <div class="card-body">
+                    Users Passed 1+ Module
+                    <div class="display-4"><?php echo $percentageUsersPassedOneModule; ?>%</div>
+                    <small>(<?php echo $employeesWhoPassedAtLeastOneModule . ' of ' . $totalEmployees . ' employees'; ?>)</small>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="user_progress_overview.php">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="dashboard-stats-container" style="display: flex; flex-wrap: wrap; gap: 20px; margin-top:20px;">
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 200px; text-align: center;">
-        <h4>Total Employees</h4>
-        <p style="font-size: 2em; margin: 5px 0;"><?php echo $totalEmployees; ?></p>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-link me-1"></i> <!-- Placeholder for FontAwesome icon -->
+                    Quick Links
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="users.php" class="text-decoration-none">Manage Users</a></li>
+                        <li class="list-group-item"><a href="manage_modules.php" class="text-decoration-none">Manage Modules & Training</a></li>
+                        <li class="list-group-item"><a href="user_progress_overview.php" class="text-decoration-none">User Progress Overview</a></li>
+                        <li class="list-group-item"><a href="module_progress_overview.php" class="text-decoration-none">Module Progress Overview</a></li>
+                        <li class="list-group-item"><a href="reports.php" class="text-decoration-none">Generate Reports</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-bell me-1"></i> <!-- Placeholder for FontAwesome icon -->
+                    System Activity (Placeholder)
+                </div>
+                <div class="card-body">
+                    No new critical system activity to show.
+                    <!-- Placeholder for future charts or activity logs -->
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 200px; text-align: center;">
-        <h4>Total Admins</h4>
-        <p style="font-size: 2em; margin: 5px 0;"><?php echo $totalAdmins; ?></p>
-    </div>
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 200px; text-align: center;">
-        <h4>Active Modules</h4>
-        <p style="font-size: 2em; margin: 5px 0;"><?php echo $totalActiveModules; ?></p>
-    </div>
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 200px; text-align: center;">
-        <h4>Inactive Modules</h4>
-        <p style="font-size: 2em; margin: 5px 0;"><?php echo $totalInactiveModules; ?></p>
-    </div>
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 300px; text-align: center;">
-        <h4>Users Passed at Least One Module</h4>
-        <p style="font-size: 2em; margin: 5px 0;"><?php echo $percentageUsersPassedOneModule; ?>%</p>
-        <small>(<?php echo $employeesWhoPassedAtLeastOneModule . ' of ' . $totalEmployees . ' employees'; ?>)</small>
-    </div>
-</div>
-
-<h2 style="margin-top:30px;">Quick Links:</h2>
-<ul>
-    <li><a href="users.php" class="button-link">Manage Users</a></li>
-    <li><a href="manage_modules.php" class="button-link">Manage Modules & Training</a></li>
-    <li><a href="user_progress_overview.php" class="button-link">User Progress Overview</a> (New)</li>
-    <li><a href="module_progress_overview.php" class="button-link">Module Progress Overview</a> (New)</li>
-</ul>
-
-<section style="margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 5px;">
-    <h2>System Activity (Placeholder)</h2>
-    <p>No new critical system activity to show.</p>
-</section>
-
-<!-- You could add more dashboard widgets or summaries here -->
+</div> <!-- Closing .container or .container-fluid from admin_header.php -->
 
 <?php
-// Placeholder for a simple footer if you create one
-// include_once '../../src/includes/admin_footer.php';
-echo "</main>"; // Close main.container from header
+// The main closing tag is in admin_header.php's structure
+// For scripts that use admin_header.php, they should end with:
+// echo "</div>"; // This closes the .container or .container-fluid from header
+// ob_end_flush();
+// echo "</body></html>";
+// However, since admin_header.php ends with opening <div class="container mt-4">
+// and the </body></html> is in this file, we just need to close the container.
+// The current admin_header.php doesn't have </body></html>, so this file provides it.
+// Let's ensure admin_header.php includes the start of the main container, and here we close it.
+// The admin_header was updated to start <div class="container mt-4">
+// So, here we need to close it.
+echo "</div>"; // This closes .container from admin_header.php
 ob_end_flush();
 ?>
 </body>

@@ -105,63 +105,75 @@ foreach ($user_submitted_answers_details as $sub_ans) {
 include_once '../../src/includes/employee_header.php';
 ?>
 
-<h1><?php echo escape_html($quiz->title); ?> - Attempt #<?php echo escape_html($attempt->attempt_number); ?></h1>
-<p>Module: <?php echo escape_html($module->title); ?></p>
+<h1 class="mb-3"><?php echo escape_html($quiz->title); ?> - Attempt #<?php echo escape_html($attempt->attempt_number); ?></h1>
+<p class="text-muted">Module: <?php echo escape_html($module->title); ?></p>
 
-<div style="padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; border: 2px solid <?php echo $passed_status ? '#28a745' : '#dc3545'; ?>;">
-    <h2 style="margin-top:0;">Your Score: <span style="color: <?php echo $passed_status ? '#28a745' : '#dc3545'; ?>;"><?php echo escape_html($score_percentage); ?>%</span></h2>
-    <h3>Status:
-        <?php if ($passed_status): ?>
-            <span style="color: #28a745;">Passed</span>
-        <?php else: ?>
-            <span style="color: #dc3545;">Failed</span>
-        <?php endif; ?>
-    </h3>
-    <p>Passing Threshold: <?php echo escape_html($quiz->passing_threshold); ?>%</p>
+<div class="card shadow-sm mb-4 <?php echo $passed_status ? 'border-success' : 'border-danger'; ?>">
+    <div class="card-header text-white <?php echo $passed_status ? 'bg-success' : 'bg-danger'; ?>">
+        <h4 class="mb-0">Quiz Result</h4>
+    </div>
+    <div class="card-body text-center">
+        <h2 class="card-title">Your Score: <span class="<?php echo $passed_status ? 'text-success' : 'text-danger'; ?>"><?php echo escape_html($score_percentage); ?>%</span></h2>
+        <h3>Status:
+            <?php if ($passed_status): ?>
+                <span class="badge bg-success fs-5">Passed</span>
+            <?php else: ?>
+                <span class="badge bg-danger fs-5">Failed</span>
+            <?php endif; ?>
+        </h3>
+        <p class="card-text">Passing Threshold: <?php echo escape_html($quiz->passing_threshold); ?>%</p>
+    </div>
 </div>
 
-<h2 style="margin-top:30px;">Detailed Breakdown:</h2>
+<h2 class="mt-4 mb-3">Detailed Breakdown:</h2>
 <?php if (empty($all_questions_for_quiz_display)): ?>
-    <p class="message info">No questions found for this quiz to display breakdown.</p>
+    <div class="alert alert-info">No questions found for this quiz to display breakdown.</div>
 <?php else: ?>
     <?php foreach ($all_questions_for_quiz_display as $index => $question): ?>
-        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 5px; background-color: #f9f9f9;">
-            <p style="font-weight: bold;">Question <?php echo $index + 1; ?>: <?php echo nl2br(escape_html($question->question_text)); ?></p>
-
-            <?php
+        <?php
             $user_answer_for_this_question = $user_answers_map[$question->question_id] ?? null;
-            $possible_answers = $answerHandler->getAnswersByQuestionId($question->question_id);
-            $correct_answer_text = 'Not defined';
-            foreach($possible_answers as $pa) { if ($pa->is_correct) $correct_answer_text = $pa->answer_text; }
-            ?>
+            $is_user_correct = $user_answer_for_this_question && $user_answer_for_this_question->is_correct;
+            $card_border_class = $is_user_correct ? 'border-success' : ($user_answer_for_this_question ? 'border-danger' : 'border-secondary');
+        ?>
+        <div class="card mb-3 <?php echo $card_border_class; ?>">
+            <div class="card-header <?php echo $is_user_correct ? 'bg-success text-white' : ($user_answer_for_this_question ? 'bg-danger text-white' : 'bg-light'); ?>">
+                <h5 class="mb-0">Question <?php echo $index + 1; ?>: <?php echo nl2br(escape_html($question->question_text)); ?></h5>
+            </div>
+            <div class="card-body">
+                <?php
+                $possible_answers = $answerHandler->getAnswersByQuestionId($question->question_id);
+                $correct_answer_text = 'Not defined'; // Should always be defined if answers exist
+                foreach($possible_answers as $pa) { if ($pa->is_correct) $correct_answer_text = $pa->answer_text; }
+                ?>
 
-            <?php if ($user_answer_for_this_question): ?>
-                <p style="margin-left: 15px;">
-                    Your Answer: <?php echo escape_html($user_answer_for_this_question->chosen_answer_text); ?>
-                    <?php if ($user_answer_for_this_question->is_correct): ?>
-                        <span style="color: green; font-weight: bold;">(Correct)</span>
-                    <?php else: ?>
-                        <span style="color: red; font-weight: bold;">(Incorrect)</span>
-                    <?php endif; ?>
-                </p>
-            <?php else: ?>
-                <p style="margin-left: 15px; color: #777;">You did not answer this question.</p>
-            <?php endif; ?>
+                <?php if ($user_answer_for_this_question): ?>
+                    <p>
+                        <strong>Your Answer:</strong> <?php echo escape_html($user_answer_for_this_question->chosen_answer_text); ?>
+                        <?php if ($is_user_correct): ?>
+                            <span class="badge bg-success">Correct</span>
+                        <?php else: ?>
+                            <span class="badge bg-danger">Incorrect</span>
+                        <?php endif; ?>
+                    </p>
+                <?php else: ?>
+                    <p class="text-muted"><em>You did not answer this question.</em></p>
+                <?php endif; ?>
 
-            <?php if (!($user_answer_for_this_question && $user_answer_for_this_question->is_correct)): // Show correct answer if user was wrong or didn't answer ?>
-                <p style="margin-left: 15px; color: green;">Correct Answer: <?php echo escape_html($correct_answer_text); ?></p>
-            <?php endif; ?>
+                <?php if (!$is_user_correct): ?>
+                    <p class="text-success"><strong>Correct Answer:</strong> <?php echo escape_html($correct_answer_text); ?></p>
+                <?php endif; ?>
+            </div>
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
 
 
-<div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc;">
+<div class="mt-4 pt-3 border-top">
     <?php if (!$passed_status): ?>
         <?php if ($quizResultHandler->canRetakeQuiz($user_id, $quiz_id, $quizHandler)): ?>
-            <a href="take_quiz.php?quiz_id=<?php echo $quiz_id; ?>" class="e-button success">Retake Quiz</a>
+            <a href="take_quiz.php?quiz_id=<?php echo $quiz_id; ?>" class="btn btn-warning btn-lg me-2">Retake Quiz</a>
         <?php else:
-            $latest_attempt_for_cooldown = $quizResultHandler->getLatestAttempt($user_id, $quiz_id); // Should be same as $attempt
+            $latest_attempt_for_cooldown = $quizResultHandler->getLatestAttempt($user_id, $quiz_id);
             if ($latest_attempt_for_cooldown && $latest_attempt_for_cooldown->completed_at) {
                  $completed_at_ts = strtotime($latest_attempt_for_cooldown->completed_at);
                  $cooldown_ends_ts = $completed_at_ts + ($quiz->cooldown_period_hours * 3600);
@@ -171,24 +183,25 @@ include_once '../../src/includes/employee_header.php';
                  $hours = floor($time_remaining_seconds / 3600);
                  $minutes = floor(($time_remaining_seconds % 3600) / 60);
 
-                echo '<p class="message error">You can retake this quiz after the cooldown period. ';
+                echo '<div class="alert alert-warning">You can retake this quiz after the cooldown period. ';
                 if ($time_remaining_seconds > 0) {
                     echo 'Time remaining: approximately ' . $hours . ' hours and ' . $minutes . ' minutes (available after ' . $cooldown_ends_date . ').';
                 } else {
-                    echo 'Cooldown should be over. Try refreshing or <a href="take_quiz.php?quiz_id='.$quiz_id.'">click here to try retake</a>.';
+                    echo 'Cooldown should be over. Try refreshing or <a href="take_quiz.php?quiz_id='.$quiz_id.'" class="alert-link">click here to try retake</a>.';
                 }
-                echo '</p>';
+                echo '</div>';
             }
         ?>
         <?php endif; ?>
     <?php endif; ?>
-    <a href="view_module.php?module_id=<?php echo escape_html($module_id); ?>" class="e-button secondary" style="margin-right: 10px;">Back to Module</a>
-    <a href="dashboard.php" class="e-button secondary">Back to Dashboard</a>
+    <a href="view_module.php?module_id=<?php echo escape_html($module_id); ?>" class="btn btn-outline-primary me-2">Back to Module</a>
+    <a href="dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
 </div>
 
 
 <?php
-echo "</main>"; // Close main.e-container from header
+// The main container div is opened in employee_header.php and should be closed here.
+echo "</div>"; // Close .container from employee_header.php
 ob_end_flush();
 ?>
 </body>

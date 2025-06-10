@@ -1,36 +1,38 @@
 <?php
-// Start session if needed for auth, but typically direct script access might not have session by default
-// For simplicity, we assume if someone has the link, they are authorized or this is a simplified setup.
-// In a production app, add authentication here.
-// require_once '../../config/database.php'; // If not already included by functions or models
-// require_once '../../src/includes/functions.php'; // For escape_html if used, and potentially session checks
+<?php
+// export_handler.php
 
-// Only run if report type is specified
-if (isset($_GET['report'])) {
+// Enforce admin access and start session handling at the very beginning.
+require_once '../../config/database.php'; // Defines $pdo and db constants if not already defined elsewhere
+require_once '../../src/includes/functions.php';
 
-    // Database connection - ensure this is available
-    // This might be better handled by including a central bootstrap/config file
-    try {
-        $pdo = new PDO("mysql:host=" . /*DB_SERVER*/'localhost' . ";dbname=" . /*DB_NAME*/'seats_db', /*DB_USERNAME*/'root', /*DB_PASSWORD*/'');
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch(PDOException $e){
-        // In a real CSV export, you wouldn't output HTML error here. Log it.
-        error_log("CSV Export DB Connection ERROR: " . $e->getMessage());
-        die("Could not connect to database for export. Check server logs.");
-    }
+start_session_if_not_started();
+require_admin(); // Ensures only logged-in Admin users can access this script.
 
-    // Include models AFTER establishing $pdo
-    require_once '../../src/User.php';
+// Models should be included after session and auth checks.
+require_once '../../src/User.php';
     require_once '../../src/Module.php';
     require_once '../../src/UserModuleProgress.php';
     require_once '../../src/Quiz.php';
     require_once '../../src/QuizResult.php';
 
+// Only run if report type is specified
+if (isset($_GET['report'])) {
+    // $pdo should be available from config/database.php
+    if (!isset($pdo)) {
+        // This case should ideally not be reached if config/database.php is included correctly.
+        error_log("export_handler.php: PDO object not available after including config.");
+        die("Database connection is not available for export. Please check server logs.");
+    }
+
+    $userHandler = new User($pdo);
+    $moduleHandler = new Module($pdo);
+    $userModuleProgressHandler = new UserModuleProgress($pdo);
+    $quizHandler = new Quiz($pdo); // Instantiate all handlers that might be needed
+    $quizResultHandler = new QuizResult($pdo);
 
     if ($_GET['report'] == 'user_progress') {
-        $userHandler = new User($pdo);
-        $moduleHandler = new Module($pdo);
-        $userModuleProgressHandler = new UserModuleProgress($pdo);
+        // User handler, module handler, UMP handler already instantiated
 
         $employees = $userHandler->getAllUsers('Employee');
         $activeModules = $moduleHandler->getAllModules(true);

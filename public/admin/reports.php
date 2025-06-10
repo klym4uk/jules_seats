@@ -11,29 +11,41 @@ $page_title = "Admin Reports";
 include_once '../../src/includes/admin_header.php';
 ?>
 
-<h1><?php echo $page_title; ?></h1>
-<p>Select a report to view or generate.</p>
+<h1 class="mb-4"><?php echo $page_title; ?></h1>
+<p class="lead">Select a report to view or generate from the options below.</p>
 
-<div class="dashboard-stats-container" style="display: flex; flex-wrap: wrap; gap: 20px; margin-top:20px;">
+<div class="row row-cols-1 row-cols-md-2 g-4">
 
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 300px;">
-        <h3>User Progress Report</h3>
-        <p>View overall progress for all employees and export data to CSV.</p>
-        <p><a href="view_user_progress_report.php" class="button-link">View User Progress Report</a></p>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">User Progress Report</h5>
+                <p class="card-text">View overall progress for all employees. This report provides insights into how employees are advancing through the available training modules. You can also export this data to CSV.</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                 <a href="view_user_progress_report.php" class="btn btn-primary">View User Progress Report</a>
+            </div>
+        </div>
     </div>
 
-    <div class="stat-card" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-basis: 300px;">
-        <h3>Quiz Results Report</h3>
-        <p>View detailed results for a specific quiz, including pass rates and individual attempts. Export data to CSV.</p>
-        <p><a href="view_quiz_results_report.php" class="button-link">View Quiz Results Report</a></p>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Quiz Results Report</h5>
+                <p class="card-text">Analyze detailed results for specific quizzes, including average scores, pass rates, and individual attempts by users. This data can be exported to CSV for further analysis.</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="view_quiz_results_report.php" class="btn btn-primary">View Quiz Results Report</a>
+            </div>
+        </div>
     </div>
 
-    <!-- Add more report sections here as needed -->
+    <!-- Add more report cards here as needed -->
 
 </div>
 
 <?php
-echo "</main>"; // Close main.container from header
+echo "</div>"; // Close .container from admin_header.php
 ob_end_flush();
 ?>
 </body>

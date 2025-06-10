@@ -146,50 +146,64 @@ foreach ($questions as $q) {
 
 include_once '../../src/includes/employee_header.php';
 ?>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0"><?php echo escape_html($quiz->title); ?></h1>
+    <a href="view_module.php?module_id=<?php echo escape_html($module_id); ?>" class="btn btn-outline-secondary">&laquo; Back to Module: <?php echo escape_html($module->title); ?></a>
+</div>
 
-<p><a href="view_module.php?module_id=<?php echo escape_html($module_id); ?>" class="e-button secondary">&laquo; Back to Module: <?php echo escape_html($module->title); ?></a></p>
+<div class="alert alert-info">
+    <h4 class="alert-heading">Instructions:</h4>
+    <p>Please read each question carefully and select the best answer for each. You must answer all questions.</p>
+    <hr>
+    <p class="mb-0">Passing Threshold: <strong><?php echo escape_html($quiz->passing_threshold); ?>%</strong></p>
+</div>
 
-<h1><?php echo escape_html($quiz->title); ?></h1>
-<p>Module: <?php echo escape_html($module->title); ?></p>
-<p>Please read each question carefully and select the best answer.</p>
-<p>Passing Threshold: <?php echo escape_html($quiz->passing_threshold); ?>%</p>
 
 <?php if (empty($questions)): ?>
-    <div class="message error">This quiz currently has no questions. Please contact an administrator.</div>
+    <div class="alert alert-danger">This quiz currently has no questions. Please contact an administrator.</div>
 <?php else: ?>
-    <form action="take_quiz.php?quiz_id=<?php echo $quiz_id; ?>" method="POST">
+    <form action="take_quiz.php?quiz_id=<?php echo $quiz_id; ?>" method="POST" class="mt-4">
         <input type="hidden" name="quiz_id" value="<?php echo $quiz_id; ?>">
         <!-- CSRF token -->
 
         <?php foreach ($questions as $index => $question): ?>
-            <fieldset style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
-                <legend style="font-weight: bold; font-size: 1.1em;">Question <?php echo $index + 1; ?>:</legend>
-                <p><?php echo nl2br(escape_html($question->question_text)); ?></p>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Question <?php echo $index + 1; ?>:</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text fs-5"><?php echo nl2br(escape_html($question->question_text)); ?></p>
 
-                <?php $answers_for_question = $question_answers_map[$question->question_id] ?? []; ?>
-                <?php if (empty($answers_for_question)): ?>
-                    <p class="message error">No answers available for this question.</p>
-                <?php else: ?>
-                    <?php foreach ($answers_for_question as $answer): ?>
-                        <div style="margin-bottom: 10px;">
-                            <input type="radio"
-                                   name="answers[<?php echo escape_html($question->question_id); ?>]"
-                                   id="answer_<?php echo escape_html($answer->answer_id); ?>"
-                                   value="<?php echo escape_html($answer->answer_id); ?>"
-                                   required> <!-- Make selection required per question -->
-                            <label for="answer_<?php echo escape_html($answer->answer_id); ?>"><?php echo escape_html($answer->answer_text); ?></label>
+                    <?php $answers_for_question = $question_answers_map[$question->question_id] ?? []; ?>
+                    <?php if (empty($answers_for_question)): ?>
+                        <div class="alert alert-warning">No answers available for this question.</div>
+                    <?php else: ?>
+                        <div class="list-group">
+                            <?php foreach ($answers_for_question as $answer): ?>
+                                <label class="list-group-item list-group-item-action">
+                                    <input class="form-check-input me-2" type="radio"
+                                           name="answers[<?php echo escape_html($question->question_id); ?>]"
+                                           id="answer_<?php echo escape_html($answer->answer_id); ?>"
+                                           value="<?php echo escape_html($answer->answer_id); ?>"
+                                           required>
+                                    <?php echo escape_html($answer->answer_text); ?>
+                                </label>
+                            <?php endforeach; ?>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </fieldset>
+                    <?php endif; ?>
+                </div>
+            </div>
         <?php endforeach; ?>
 
-        <button type="submit" class="e-button success" style="font-size: 1.2em; padding: 12px 25px;">Submit Quiz</button>
+        <div class="text-center mt-4 mb-4">
+            <button type="submit" class="btn btn-success btn-lg px-5">Submit Quiz</button>
+        </div>
     </form>
 <?php endif; ?>
 
 <?php
-echo "</main>"; // Close main.e-container from header
+// The main container div is opened in employee_header.php and should be closed here.
+echo "</div>"; // Close .container from employee_header.php
 ob_end_flush();
 ?>
 </body>
